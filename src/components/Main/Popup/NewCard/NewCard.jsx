@@ -1,4 +1,26 @@
-export default function NewCard() {
+import { useState } from "react";
+
+export default function NewCard({ onAddPlaceSubmit }) {
+  const [name, setName] = useState("");
+  const [link, setLink] = useState("");
+
+  function handleNameChange(e) {
+    setName(e.target.value);
+  }
+
+  function handleLinkChange(e) {
+    setLink(e.target.value);
+  }
+
+  function handleSubmit(e) {
+    e.preventDefault();
+
+    onAddPlaceSubmit({ name, link });
+
+    setName("");
+    setLink("");
+  }
+
   return (
     <form className="form" id="form-new-place">
       <h3 className="form__title">Nuevo lugar</h3>

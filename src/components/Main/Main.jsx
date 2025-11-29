@@ -10,44 +10,103 @@ import EditAvatar from "./Popup/EditAvatar/EditAvatar";
 
 import Card from "./components/Card/Card";
 
-import { useState } from "react";
-import ImageExpansion from "./Popup/ImageExpansion/ImageExpansion";
+import { useContext } from "react";
+import api from "../../utils/api";
+import CurrentUserContext from "../../contexts/CurrentUserContext";
 
-const cards = [
-  {
-    isLiked: false,
-    _id: "5d1f0611d321eb4bdcd707dd",
-    name: "Yosemite Valley",
-    link: "https://practicum-content.s3.us-west-1.amazonaws.com/web-code/moved_yosemite.jpg",
-    owner: "5d1f0611d321eb4bdcd707dd",
-    createdAt: "2019-07-05T08:10:57.741Z",
-  },
-  {
-    isLiked: false,
-    _id: "5d1f064ed321eb4bdcd707de",
-    name: "Lake Louise",
-    link: "https://practicum-content.s3.us-west-1.amazonaws.com/web-code/moved_lake-louise.jpg",
-    owner: "5d1f0611d321eb4bdcd707dd",
-    createdAt: "2019-07-05T08:11:58.324Z",
-  },
-];
+export default function Main({
+  onOpenPopup,
+  onClosePopup,
+  popup,
+  cards,
+  onCardLike,
+  onCardDelete,
+  onAddPlaceSubmit,
+}) {
+  // const [cards, setCards] = useState([]);
 
-console.log(cards);
-
-export default function Main() {
-  const [popup, setPopup] = useState(null);
-
-  const newCardPopup = { title: "New card", children: <NewCard /> };
+  const newCardPopup = {
+    title: "New card",
+    children: <NewCard onAddPlaceSubmit={onAddPlaceSubmit} />,
+  };
   const editProfilePopup = { title: "Edit profile", children: <EditProfile /> };
   const editAvatarPopup = { title: "Edit avatar", children: <EditAvatar /> };
 
-  function handleOpenPopup(popup) {
-    setPopup(popup);
+  const { currentUser } = useContext(CurrentUserContext);
+
+  function handleOpenPopup(popupConfig) {
+    onOpenPopup(popupConfig);
   }
 
   function handleClosePopup() {
-    setPopup(null);
+    onClosePopup();
   }
+
+  //BORRADO 15.5
+  // async function handleCardLike(card) {
+  //   // Verifica una vez más si a esta tarjeta ya le has dado like
+  //   const isLiked = card.isLiked;
+
+  //   // Envía una solicitud a la API y obtiene los datos actualizados de la tarjeta
+  //   await api
+  //     .changeLikeCardStatus(card._id, !isLiked)
+  //     .then((newCard) => {
+  //       setCards((state) =>
+  //         state.map((currentCard) =>
+  //           currentCard._id === card._id ? newCard : currentCard
+  //         )
+  //       );
+  //     })
+  //     .catch((error) => console.error(error));
+  // }
+
+  // async function handleCardDelete(card) {
+  //   await api
+  //     .deleteCard(card._id)
+  //     .then(() => {
+  //       setCards((state) =>
+  //         state.filter((currentCard) => currentCard._id !== card._id)
+  //       );
+  //     })
+  //     .catch((error) => console.error(error));
+  // }
+
+  async function handleCardLike(card) {
+    const isLiked = card.isLiked;
+    await api
+      .changeLikeCardStatus(card._id, !isLiked)
+      .then((newCard) => {
+        setCards((state) =>
+          state.map((currentCard) =>
+            currentCard._id === card._id ? newCard : currentCard
+          )
+        );
+      })
+      .catch((error) => console.error(error));
+  }
+
+  async function handleCardDelete(card) {
+    await api
+      .deleteCard(card._id)
+      .then(() => {
+        setCards((state) =>
+          state.filter((currentCard) => currentCard._id !== card._id)
+        );
+      })
+      .catch((error) => console.error(error));
+  }
+
+  //BORRAR rn 15.6
+  // useEffect(() => {
+  //   api
+  //     .getInitialCards()
+  //     .then((cardsData) => {
+  //       setCards(cardsData);
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //     });
+  // }, []);
 
   // const Main = () => {
   return (
@@ -56,7 +115,8 @@ export default function Main() {
         <div className="profile__image-wrapper">
           <img
             className="profile__image"
-            src={profileImage}
+            //src={profileImage}
+            src={currentUser.avatar}
             alt="Jacques Cousteau image"
             onClick={() => handleOpenPopup(editAvatarPopup)}
           />
@@ -67,7 +127,7 @@ export default function Main() {
           />{" "}
         </div>
         <div className="profile__info">
-          <h1 className="profile__info-name">Jacques Cousteau</h1>
+          <h1 className="profile__info-name">{currentUser.name}</h1>
           <a href="#">
             <img
               className="profile__info profile__info_edit-button"
@@ -76,7 +136,9 @@ export default function Main() {
               onClick={() => handleOpenPopup(editProfilePopup)}
             />
           </a>
-          <p className="profile__info profile__info_description">Explorador</p>
+          <p className="profile__info profile__info_description">
+            {currentUser.about}
+          </p>
         </div>
         <button
           className="profile__add-button"
@@ -88,9 +150,16 @@ export default function Main() {
       </section>
       <section className="elements">
         {cards.map((card) => (
-          <Card key={card._id} card={card} handleOpenPopup={handleOpenPopup} />
+          <Card
+            key={card._id}
+            card={card}
+            handleOpenPopup={handleOpenPopup}
+            onCardLike={onCardLike}
+            onCardDelete={onCardDelete}
+          />
         ))}
       </section>
+
       {popup && (
         <Popup onClose={handleClosePopup} title={popup.title}>
           {popup.children}
