@@ -23,7 +23,7 @@ export default function Main({
   onCardDelete,
   onAddPlaceSubmit,
 }) {
-  // const [cards, setCards] = useState([]);
+  const { currentUser } = useContext(CurrentUserContext);
 
   const newCardPopup = {
     title: "New card",
@@ -32,8 +32,6 @@ export default function Main({
   const editProfilePopup = { title: "Edit profile", children: <EditProfile /> };
   const editAvatarPopup = { title: "Edit avatar", children: <EditAvatar /> };
 
-  const { currentUser } = useContext(CurrentUserContext);
-
   function handleOpenPopup(popupConfig) {
     onOpenPopup(popupConfig);
   }
@@ -41,13 +39,9 @@ export default function Main({
   function handleClosePopup() {
     onClosePopup();
   }
-
-  //BORRADO 15.5
+  //BORRAR
   // async function handleCardLike(card) {
-  //   // Verifica una vez más si a esta tarjeta ya le has dado like
   //   const isLiked = card.isLiked;
-
-  //   // Envía una solicitud a la API y obtiene los datos actualizados de la tarjeta
   //   await api
   //     .changeLikeCardStatus(card._id, !isLiked)
   //     .then((newCard) => {
@@ -71,44 +65,6 @@ export default function Main({
   //     .catch((error) => console.error(error));
   // }
 
-  async function handleCardLike(card) {
-    const isLiked = card.isLiked;
-    await api
-      .changeLikeCardStatus(card._id, !isLiked)
-      .then((newCard) => {
-        setCards((state) =>
-          state.map((currentCard) =>
-            currentCard._id === card._id ? newCard : currentCard
-          )
-        );
-      })
-      .catch((error) => console.error(error));
-  }
-
-  async function handleCardDelete(card) {
-    await api
-      .deleteCard(card._id)
-      .then(() => {
-        setCards((state) =>
-          state.filter((currentCard) => currentCard._id !== card._id)
-        );
-      })
-      .catch((error) => console.error(error));
-  }
-
-  //BORRAR rn 15.6
-  // useEffect(() => {
-  //   api
-  //     .getInitialCards()
-  //     .then((cardsData) => {
-  //       setCards(cardsData);
-  //     })
-  //     .catch((err) => {
-  //       console.log(err);
-  //     });
-  // }, []);
-
-  // const Main = () => {
   return (
     <main className="content">
       <section className="profile">

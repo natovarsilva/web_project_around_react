@@ -22,7 +22,7 @@ export default function NewCard({ onAddPlaceSubmit }) {
   }
 
   return (
-    <form className="form" id="form-new-place">
+    <form className="form" id="form-new-place" onSubmit={handleSubmit}>
       <h3 className="form__title">Nuevo lugar</h3>
       <input
         className="form__text-input form__text-input_name"
@@ -33,6 +33,8 @@ export default function NewCard({ onAddPlaceSubmit }) {
         required
         minLength="2"
         maxLength="30"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
       />
       <span id="input-place-name-error" className="form__error-msg"></span>
       <input
@@ -42,6 +44,8 @@ export default function NewCard({ onAddPlaceSubmit }) {
         id="input-place-image"
         name="input-place-image"
         required
+        value={link}
+        onChange={(e) => setLink(e.target.value)}
       />
       <span id="input-place-image-error" className="form__error-msg"></span>
       <button className="form__submit form__submit_inactive" type="submit">
